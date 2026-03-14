@@ -39,12 +39,12 @@ regd_users.post("/login", (req, res) => {
 		let accessToken = jwt.sign({ data: password }, "access", {
 			expiresIn: 60 * 60,
 		});
-    console.log("accessToken: ", accessToken);
+		console.log("accessToken: ", accessToken);
 		req.session.authorization = {
 			accessToken,
 			username,
 		};
-    console.log("req.session.authorization: ", req.session.authorization);
+		console.log("req.session.authorization: ", req.session.authorization);
 		return res.status(200).json({ message: "User successfully logged in" });
 	}
 
@@ -53,8 +53,18 @@ regd_users.post("/login", (req, res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
+	const isbn = req.params.isbn;
+	const review = req.body.review;
+	const username = req.session.authorization.username;
+
+	if (!books[isbn]) {
+		return res.status(404).json({ message: "Book not found" });
+	}
+
+	books[isbn].reviews[username] = review;
+
 	//Write your code here
-	return res.status(300).json({ message: "Yet to be implemented" });
+	return res.status(201).json({ message: "Review added/updated successfully" });
 });
 
 module.exports.authenticated = regd_users;
