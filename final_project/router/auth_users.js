@@ -3,12 +3,7 @@ const jwt = require("jsonwebtoken");
 let books = require("./booksdb.js");
 const regd_users = express.Router();
 
-let users = [
-	{
-		username: "Don",
-		password: "test",
-	},
-];
+let users = [];
 
 const isValid = (username, password) => {
 	if (!username || !password) {
@@ -39,12 +34,10 @@ regd_users.post("/login", (req, res) => {
 		let accessToken = jwt.sign({ data: password }, "access", {
 			expiresIn: 60 * 60,
 		});
-		console.log("accessToken: ", accessToken);
 		req.session.authorization = {
 			accessToken,
 			username,
 		};
-		console.log("req.session.authorization: ", req.session.authorization);
 		return res.status(200).json({ message: "User successfully logged in" });
 	}
 
@@ -63,7 +56,6 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 
 	books[isbn].reviews[username] = review;
 
-	//Write your code here
 	return res.status(201).json({ message: "Review added/updated successfully" });
 });
 
