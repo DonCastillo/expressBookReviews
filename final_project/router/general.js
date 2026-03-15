@@ -7,7 +7,7 @@ const public_users = express.Router();
 public_users.post("/register", (req, res) => {
 	const username = req.body.username;
 	const password = req.body.password;
-  
+
 	if (!isValid(username, password)) {
 		return res
 			.status(400)
@@ -25,7 +25,16 @@ public_users.post("/register", (req, res) => {
 
 // Get the book list available in the shop
 public_users.get("/", function (req, res) {
-	return res.status(200).json(books);
+	const getBooks = new Promise((resolve, reject) => {
+		resolve(books);
+	});
+	getBooks
+		.then((books) => {
+			return res.status(200).json(books);
+		})
+		.catch((er) => {
+			return res.status(500).json({ message: "Error retrieving books" });
+		});
 });
 
 // Get book details based on ISBN
