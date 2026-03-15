@@ -2,7 +2,9 @@ const express = require("express");
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
+const axios = require("axios");
 const public_users = express.Router();
+const BASE_URL = "http://localhost:5000";
 
 public_users.post("/register", (req, res) => {
 	const username = req.body.username;
@@ -39,13 +41,15 @@ public_users.get("/", function (req, res) {
 
 // Get book details based on ISBN
 public_users.get("/isbn/:isbn", function (req, res) {
-	const getBookDetails = new Promise((resolve, reject) => {
-		if (!books[req.params.isbn]) {
+	const getBookDetails = new Promise(async (resolve, reject) => {
+		const booksRaw = await axios.get(`${BASE_URL}/`).then((res) => res.data);
+		if (!booksRaw[req.params.isbn]) {
 			reject("Book not found");
 		} else {
-			resolve(books[req.params.isbn]);
+			resolve(booksRaw[req.params.isbn]);
 		}
 	});
+
 	getBookDetails
 		.then((bookDetails) => {
 			return res.status(200).json(bookDetails);
@@ -57,9 +61,10 @@ public_users.get("/isbn/:isbn", function (req, res) {
 
 // Get book details based on author
 public_users.get("/author/:author", function (req, res) {
-	const getBookDetails = new Promise((resolve, reject) => {
+	const getBookDetails = new Promise(async (resolve, reject) => {
 		const author = req.params.author;
-		let bookSelected = Object.values(books).filter(
+		const booksRaw = await axios.get(`${BASE_URL}/`).then((res) => res.data);
+		let bookSelected = Object.values(booksRaw).filter(
 			(book) => book.author === author,
 		);
 		if (!bookSelected[0] || bookSelected.length === 0) {
@@ -80,9 +85,10 @@ public_users.get("/author/:author", function (req, res) {
 
 // Get all books based on title
 public_users.get("/title/:title", function (req, res) {
-	const getBookDetails = new Promise((resolve, reject) => {
+	const getBookDetails = new Promise(async (resolve, reject) => {
 		const title = req.params.title;
-		let bookSelected = Object.values(books).filter(
+		const booksRaw = await axios.get(`${BASE_URL}/`).then((res) => res.data);
+		let bookSelected = Object.values(booksRaw).filter(
 			(book) => book.title === title,
 		);
 		if (!bookSelected[0] || bookSelected.length === 0) {
@@ -104,7 +110,14 @@ public_users.get("/title/:title", function (req, res) {
 //  Get book review
 public_users.get("/review/:isbn", function (req, res) {
 	const isbn = req.params.isbn;
-	let reviews = books[isbn] ? books[isbn]?.reviews : {};
+	if (!books[isbn]) {
+		return res.status(400).json({ message: "Book not found" });
+	}
+	if (!books[isbn]?.reviews || Object.keys(books[isbn].reviews).length === 0) {
+		return res.status(404).json({ message: "No reviews found for this book" });
+	}
+
+	let reviews = books[isbn].reviews;
 	return res.status(200).json(reviews);
 });
 

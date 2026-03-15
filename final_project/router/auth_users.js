@@ -38,7 +38,7 @@ regd_users.post("/login", (req, res) => {
 			accessToken,
 			username,
 		};
-		return res.status(200).json({ message: "User successfully logged in" });
+		return res.status(200).json({ message: "Login successful!" });
 	}
 
 	return res.status(400).json({ message: "Invalid login" });
@@ -73,7 +73,7 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
 	}
 
 	delete books[isbn].reviews[username];
-	return res.status(200).json({ message: "Review deleted successfully" });
+	return res.status(200).json({ message: `Review for ISBN ${isbn} deleted` });
 });
 
 module.exports.authenticated = regd_users;
