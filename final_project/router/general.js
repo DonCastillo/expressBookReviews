@@ -78,7 +78,7 @@ public_users.get("/isbn/:isbn", async function (req, res) {
 	}
 });
 
-// Get book details based on author
+// Get book details based on author using async + await
 public_users.get("/author/:author", async function (req, res) {
 	try {
 		const results = await axios.get(
@@ -90,7 +90,7 @@ public_users.get("/author/:author", async function (req, res) {
 	}
 });
 
-// Get all books based on title
+// Get all books based on title using async + await
 public_users.get("/title/:title", async function (req, res) {
 	try {
 		const results = await axios.get(
